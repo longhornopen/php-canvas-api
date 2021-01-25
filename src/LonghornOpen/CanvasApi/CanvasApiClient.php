@@ -67,7 +67,7 @@ class CanvasApiClient
         if ($response->hasHeader('link')) {
             return new ResponseIterator($response, $this->client);
         }
-        return json_decode($response->getBody()->getContents(), true);
+        return json_decode($response->getBody()->getContents(), false);
     }
 
     /**
@@ -83,7 +83,7 @@ class CanvasApiClient
         if ($response->hasHeader('link')) {
             return iterator_to_array(new ResponseIterator($response, $this->client));
         }
-        return json_decode($response->getBody()->getContents(), true);
+        return json_decode($response->getBody()->getContents(), false);
     }
 
     protected function getFullUrl($api_url)
@@ -109,7 +109,7 @@ class CanvasApiClient
                 'json' => $this->cleanDataForJSON($data)
             ]
         );
-        return json_decode($response->getBody()->getContents(), true);
+        return json_decode($response->getBody()->getContents(), false);
     }
 
     /**
@@ -126,7 +126,7 @@ class CanvasApiClient
                 'json' => $this->cleanDataForJSON($data)
             ]
         );
-        return json_decode($response->getBody()->getContents(), true);
+        return json_decode($response->getBody()->getContents(), false);
     }
 
     /**
@@ -139,7 +139,7 @@ class CanvasApiClient
             'DELETE',
             $this->getFullUrl($api_url)
         );
-        return json_decode($response->getBody()->getContents(), true);
+        return json_decode($response->getBody()->getContents(), false);
     }
 
     public function cleanDataForJSON($data)

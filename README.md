@@ -3,15 +3,15 @@ PHP library for talking to Instructure's Canvas via its API.
 
 ## Composer installation
 
-_WRITEME_
+`composer require longhornopen/canvas-api`
 
 ## Usage examples
 
-        use Laits\CanvasApi\CanvasApi;
+        use LonghornOpen\CanvasApi\CanvasApiClient;
         
         $api_host = 'myschool.instructure.com';
         $access_key = '1234567890abcdef....';
-        $api = new CanvasApi($api_host, $access_key);
+        $api = new CanvasApiClient($api_host, $access_key);
         
         // Some API calls return a single object, which will be given as a stdClass.
         $me = $api->get('/users/self');
