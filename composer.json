@@ -1,0 +1,19 @@
+{
+    "name": "longhornopen/canvas-api",
+    "description": "PHP client for the Canvas API",
+    "type": "library",
+    "require": {
+        "php": "^7.1",
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "^6.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0"
+    },
+    "license": "GPL-3.0-or-later",
+    "autoload": {
+        "psr-4": {
+            "LonghornOpen\\CanvasApi\\": "src/LonghornOpen/CanvasApi/"
+        }
+    }
+}
