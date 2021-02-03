@@ -52,7 +52,7 @@ class ResponseIterator implements Iterator
 
     protected function parse_response($response)
     {
-        $new_data = json_decode($response->getBody()->getContents(), true);
+        $new_data = json_decode($response->getBody()->getContents(), false);
         $this->array = array_merge($this->array, $new_data);
         $links = $this->parse_pagination_headers($response->getHeader("link")[0]);
         if (array_key_exists('next', $links)) {
