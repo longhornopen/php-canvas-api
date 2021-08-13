@@ -3,7 +3,7 @@
     "description": "PHP client for the Canvas API",
     "type": "library",
     "require": {
-        "php": "^7.1",
+        "php": "^7.1|^8.0",
         "ext-json": "*",
         "guzzlehttp/guzzle": "~7.0"
     },
