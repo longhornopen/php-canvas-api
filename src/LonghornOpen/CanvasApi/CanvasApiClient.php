@@ -79,7 +79,7 @@ class CanvasApiClient
      * @return array|mixed An object or an array, depending on whether the API endpoint is for a single object or a list.
      * @throws GuzzleException
      */
-    public function get($api_url, $wrapper_element)
+    public function get($api_url, $wrapper_element=null)
     {
         $response = $this->client->request(
             'GET',
