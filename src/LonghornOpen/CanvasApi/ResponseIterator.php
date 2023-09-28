@@ -11,9 +11,11 @@ class ResponseIterator implements Iterator
     private $array = [];
     private $client;
     private $next_url;
+    private $list_wrapper_element = null;
 
-    public function __construct($response, $client)
+    public function __construct($response, $client, $list_wrapper_element = null)
     {
+        $this->list_wrapper_element = $list_wrapper_element;
         $this->parse_response($response);
         $this->client = $client;
     }
@@ -52,8 +54,11 @@ class ResponseIterator implements Iterator
 
     protected function parse_response($response)
     {
-        $new_data = json_decode($response->getBody()->getContents(), false);
-        $this->array = array_merge($this->array, $new_data);
+        $contents = json_decode($response->getBody()->getContents(), false);
+        if ($this->list_wrapper_element) {
+            $contents = $contents->{$this->list_wrapper_element};
+        }
+        $this->array = array_merge($this->array, $contents);
         $links = $this->parse_pagination_headers($response->getHeader("link")[0]);
         if (array_key_exists('next', $links)) {
             $this->next_url = $links['next'];

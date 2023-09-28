@@ -3,6 +3,7 @@
 namespace LonghornOpen\CanvasApi;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestInterface;
@@ -55,33 +56,37 @@ class CanvasApiClient
     }
 
     /**
-     * @param string $api_url The Canvas API URL you want to make a GET request again.  ex: 'courses/1', '/users/123?per_page=100'
+     * @param string $api_url The Canvas API URL you want to make a GET request for.  ex: 'courses/1', '/users/123?per_page=100'
+     * @param string $wrapper_element If this API returns a list of items wrapped in an element (such as the Enrollment Terms API), the name of that element.
      * @return ResponseIterator|mixed An object or an Iterator, depending on whether the API endpoint is for a single object or a list.
+     * @throws GuzzleException
      */
-    public function get_iterator($api_url)
+    public function get_iterator($api_url, $wrapper_element=null)
     {
         $response = $this->client->request(
             'GET',
             $this->getFullUrl($api_url)
         );
         if ($response->hasHeader('link')) {
-            return new ResponseIterator($response, $this->client);
+            return new ResponseIterator($response, $this->client, $wrapper_element);
         }
         return json_decode($response->getBody()->getContents(), false);
     }
 
     /**
-     * @param string $api_url The Canvas API URL you want to make a GET request again.  ex: '/courses/1', '/users/123?per_page=100'
+     * @param string $api_url The Canvas API URL you want to make a GET request for.  ex: '/courses/1', '/users/123?per_page=100'
+     * @param string $wrapper_element If this API returns a list of items wrapped in an element (such as the Enrollment Terms API), the name of that element.
      * @return array|mixed An object or an array, depending on whether the API endpoint is for a single object or a list.
+     * @throws GuzzleException
      */
-    public function get($api_url)
+    public function get($api_url, $wrapper_element)
     {
         $response = $this->client->request(
             'GET',
             $this->getFullUrl($api_url)
         );
         if ($response->hasHeader('link')) {
-            return iterator_to_array(new ResponseIterator($response, $this->client));
+            return iterator_to_array(new ResponseIterator($response, $this->client, $wrapper_element));
         }
         return json_decode($response->getBody()->getContents(), false);
     }
@@ -99,6 +104,7 @@ class CanvasApiClient
      * @param string $api_url
      * @param array $data
      * @return object|null
+     * @throws GuzzleException
      */
     public function post($api_url, $data)
     {
@@ -116,6 +122,7 @@ class CanvasApiClient
      * @param string $api_url
      * @param array $data
      * @return object|null
+     * @throws GuzzleException
      */
     public function put($api_url, $data)
     {
@@ -132,6 +139,7 @@ class CanvasApiClient
     /**
      * @param string $api_url
      * @return object|null
+     * @throws GuzzleException
      */
     public function delete($api_url)
     {
