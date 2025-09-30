@@ -141,11 +141,18 @@ class CanvasApiClient
      * @return object|null
      * @throws GuzzleException
      */
-    public function delete($api_url)
+    public function delete($api_url, $data)
     {
+        if (empty($data)) {
+            $data = [];
+        }
+
         $response = $this->client->request(
             'DELETE',
-            $this->getFullUrl($api_url)
+            $this->getFullUrl($api_url),
+            [
+                'json' => $this->cleanDataForJSON($data)
+            ]
         );
         return json_decode($response->getBody()->getContents(), false);
     }
