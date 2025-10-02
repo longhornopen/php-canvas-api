@@ -141,7 +141,7 @@ class CanvasApiClient
      * @return object|null
      * @throws GuzzleException
      */
-    public function delete($api_url, $data)
+    public function delete($api_url, $data = [])
     {
         if (empty($data)) {
             $data = [];
