@@ -2,40 +2,49 @@
 
 namespace LonghornOpen\CanvasApi;
 
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use Iterator;
+use Psr\Http\Message\ResponseInterface;
 
+/** @implements Iterator<int, mixed> */
 class ResponseIterator implements Iterator
 {
-    private $position = 0;
-    private $array = [];
-    private $client;
-    private $next_url;
-    private $list_wrapper_element = null;
+    private int $position = 0;
 
-    public function __construct($response, $client, $list_wrapper_element = null)
+    /** @var list<mixed> */
+    private array $array = [];
+
+    private ClientInterface $client;
+    private ?string $next_url = null;
+    private ?string $list_wrapper_element;
+
+    public function __construct(
+        ResponseInterface $response,
+        ClientInterface $client,
+        ?string $list_wrapper_element = null
+    )
     {
         $this->list_wrapper_element = $list_wrapper_element;
         $this->parse_response($response);
         $this->client = $client;
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         $this->position = 0;
     }
 
-    public function current()
+    public function current(): mixed
     {
         return $this->array[$this->position];
     }
 
-    public function key()
+    public function key(): int
     {
         return $this->position;
     }
 
-    public function next()
+    public function next(): void
     {
         if (($this->position + 1) >= count($this->array) && $this->next_url) {
             $response = $this->client->request(
@@ -47,12 +56,12 @@ class ResponseIterator implements Iterator
         ++$this->position;
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->array[$this->position]);
     }
 
-    protected function parse_response($response)
+    protected function parse_response(ResponseInterface $response): void
     {
         $contents = json_decode($response->getBody()->getContents(), false);
         if ($this->list_wrapper_element) {
@@ -69,8 +78,10 @@ class ResponseIterator implements Iterator
 
     // Pagination headers are defined at https://canvas.instructure.com/doc/api/file.pagination.html
     // That format's a bit clunky, though - parse it into a name/value pair list for easier handling
-    protected function parse_pagination_headers($link_header)
+    /** @return array<string, string> */
+    protected function parse_pagination_headers(string $link_header): array
     {
+        $retval = [];
         $link_header_items = explode(",", $link_header);
         foreach ($link_header_items as $item) {
             $item_parts = explode("; ", $item);

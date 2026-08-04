@@ -17,7 +17,7 @@ PHP library for talking to Instructure's Canvas via its API.
         $me = $api->get('/users/self');
         echo($me->name);
         
-        // Some API calls return lists, which will be given as PHP7 Iterators.
+        // Some API calls return lists, which will be given as Iterators.
         // If there are multiple pages of results, the iterator will automatically fetch them.
         $my_courses = $api->get('/courses?per_page=100');
         foreach ($my_courses as $my_course) {

@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class BaseHttpOperationsTest extends TestCase
 {
-    protected $api;
+    protected CanvasApiClient $api;
 
     protected function setUp(): void
     {
@@ -17,7 +17,7 @@ class BaseHttpOperationsTest extends TestCase
         $this->api = new CanvasApiClient($api_host, $access_key);
     }
 
-    public function testNonPaginatedItemGet()
+    public function testNonPaginatedItemGet(): void
     {
         // Can we get a single item from the Canvas API?
         $me = $this->api->get('/users/self');
@@ -25,14 +25,14 @@ class BaseHttpOperationsTest extends TestCase
         $this->assertObjectHasAttribute('name', $me);
     }
 
-    public function testPaginatedListGetZeroItems()
+    public function testPaginatedListGetZeroItems(): void
     {
         $accounts = $this->api->get('/accounts/');
         $this->assertIsArray($accounts);
         $this->assertSame(0, count($accounts));
     }
 
-    public function testUnauthorized()
+    public function testUnauthorized(): void
     {
         $this->expectException(CanvasApiException::class);
         $this->expectExceptionCode(401);
@@ -41,27 +41,27 @@ class BaseHttpOperationsTest extends TestCase
         $this->api->get('/accounts/' . $single_account_id);
     }
 
-    public function testNonPaginatedListGet()
+    public function testNonPaginatedListGet(): void
     {
         $courses = $this->api->get('/courses');
         $this->assertIsArray($courses);
         $this->assertGreaterThan(1, count($courses));
     }
 
-    public function testPaginatedListGet()
+    public function testPaginatedListGet(): void
     {
         $courses = $this->api->get('/courses?per_page=1');
         $this->assertIsArray($courses);
         $this->assertGreaterThan(1, count($courses));
     }
 
-    public function testArrayGet()
+    public function testArrayGet(): void
     {
         $students = $this->api->get('/courses/2/students');
         $this->assertIsArray($students);
     }
 
-    public function testGetSquareBracketParams()
+    public function testGetSquareBracketParams(): void
     {
         $courses = $this->api->get('/courses?include[]=term&include[]=account');
         $this->assertIsArray($courses);
@@ -71,7 +71,7 @@ class BaseHttpOperationsTest extends TestCase
         $this->assertObjectHasAttribute('account', $course);
     }
 
-    public function testPostSquareBracketParams()
+    public function testPostSquareBracketParams(): void
     {
         $convos = $this->api->post('/conversations', [
             'recipients' => ['2', '3'],
@@ -83,7 +83,7 @@ class BaseHttpOperationsTest extends TestCase
         $this->assertEquals(1, count($convos));
     }
 
-    public function testPostPutDeleteLifecycle()
+    public function testPostPutDeleteLifecycle(): void
     {
         $courses = $this->api->get('/courses');
         $course = $courses[0];
@@ -91,7 +91,7 @@ class BaseHttpOperationsTest extends TestCase
 
         // Should not have an assignment
         $assignments = $this->api->get('/courses/' . $course->id . '/assignments');
-        $matching_assignments = array_filter($assignments, function ($assn) use ($assignment_name) {
+        $matching_assignments = array_filter($assignments, static function (object $assn) use ($assignment_name): bool {
             return $assn->name === $assignment_name;
         });
         $this->assertCount(0, $matching_assignments);
@@ -109,7 +109,7 @@ class BaseHttpOperationsTest extends TestCase
 
         // Should have an assignment
         $assignments = $this->api->get('/courses/' . $course->id . '/assignments');
-        $matching_assignments = array_values(array_filter($assignments, function ($assn) use ($assignment_name) {
+        $matching_assignments = array_values(array_filter($assignments, static function (object $assn) use ($assignment_name): bool {
             return $assn->name === $assignment_name;
         }));
         $this->assertCount(1, $matching_assignments);
@@ -127,7 +127,7 @@ class BaseHttpOperationsTest extends TestCase
 
         // Assignment should be edited
         $assignments = $this->api->get('/courses/' . $course->id . '/assignments');
-        $matching_assignments = array_values(array_filter($assignments, function ($assn) use ($assignment_name) {
+        $matching_assignments = array_values(array_filter($assignments, static function (object $assn) use ($assignment_name): bool {
             return $assn->name === $assignment_name;
         }));
         $this->assertCount(1, $matching_assignments);
@@ -138,21 +138,22 @@ class BaseHttpOperationsTest extends TestCase
 
         // Assignment should be gone
         $assignments = $this->api->get('/courses/' . $course->id . '/assignments');
-        $matching_assignments = array_filter($assignments, function ($assn) use ($assignment_name) {
+        $matching_assignments = array_filter($assignments, static function (object $assn) use ($assignment_name): bool {
             return $assn->name === $assignment_name;
         });
         $this->assertCount(0, $matching_assignments);
     }
 
-    public function testCleanDataForJSON() {
+    public function testCleanDataForJSON(): void
+    {
         $data = $this->api->cleanDataForJSON(['foo' => 'bar']);
         $this->assertEquals('bar', $data['foo']);
 
-        $data = $this->api->cleanDataForJSON(['foo' => [1,2]]);
-        $this->assertEquals([1,2], $data['foo']);
+        $data = $this->api->cleanDataForJSON(['foo' => [1, 2]]);
+        $this->assertEquals([1, 2], $data['foo']);
 
-        $data = $this->api->cleanDataForJSON(['foo[]' => [1,2]]);
-        $this->assertEquals([1,2], $data['foo']);
+        $data = $this->api->cleanDataForJSON(['foo[]' => [1, 2]]);
+        $this->assertEquals([1, 2], $data['foo']);
 
         $data = $this->api->cleanDataForJSON(['assignment[name]' => 'myname']);
         $this->assertEquals('myname', $data['assignment']['name']);

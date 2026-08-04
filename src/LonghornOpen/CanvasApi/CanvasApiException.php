@@ -6,9 +6,9 @@ use RuntimeException;
 
 class CanvasApiException extends RuntimeException
 {
-    protected $response_body;
+    protected string $response_body;
 
-    public function __construct($http_status_code, $response_body)
+    public function __construct(int $http_status_code, string $response_body)
     {
         $this->response_body = $response_body;
         $message = 'Error ' . $http_status_code . ': ' . $response_body;
