@@ -29,3 +29,4 @@ PHP library for talking to Instructure's Canvas via its API.
 
 ## Version history
 * 1.0 - public release
+* 2.0 - Bump PHP minimum version, add type hints
